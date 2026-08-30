@@ -12,8 +12,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # -----------------------------------------------------------------------------
 # Library
 # -----------------------------------------------------------------------------
-
 add_library(scheduler
+    src/request.cpp
     src/scheduler.cpp
     src/worker_pool.cpp
     src/kv_cache.cpp
@@ -22,13 +22,12 @@ add_library(scheduler
 
 target_include_directories(scheduler
     PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include
 )
 
 # -----------------------------------------------------------------------------
 # Example
 # -----------------------------------------------------------------------------
-
 add_executable(basic_scheduler
     examples/basic_scheduler.cpp
 )
@@ -44,42 +43,42 @@ target_link_libraries(basic_scheduler
 # enable_testing()
 
 # add_executable(scheduler_test
-#     tests/scheduler_test.cpp
+# tests/scheduler_test.cpp
 # )
 
 # target_link_libraries(scheduler_test
-#     PRIVATE scheduler
+# PRIVATE scheduler
 # )
 
 # add_test(
-#     NAME scheduler_test
-#     COMMAND scheduler_test
+# NAME scheduler_test
+# COMMAND scheduler_test
 # )
 
 # add_executable(kv_cache_test
-#     tests/kv_cache_test.cpp
+# tests/kv_cache_test.cpp
 # )
 
 # target_link_libraries(kv_cache_test
-#     PRIVATE scheduler
+# PRIVATE scheduler
 # )
 
 # add_test(
-#     NAME kv_cache_test
-#     COMMAND kv_cache_test
+# NAME kv_cache_test
+# COMMAND kv_cache_test
 # )
 
 # add_executable(concurrency_test
-#     tests/concurrency_test.cpp
+# tests/concurrency_test.cpp
 # )
 
 # target_link_libraries(concurrency_test
-#     PRIVATE scheduler
+# PRIVATE scheduler
 # )
 
 # add_test(
-#     NAME concurrency_test
-#     COMMAND concurrency_test
+# NAME concurrency_test
+# COMMAND concurrency_test
 # )
 
 # # -----------------------------------------------------------------------------
@@ -87,9 +86,9 @@ target_link_libraries(basic_scheduler
 # # -----------------------------------------------------------------------------
 
 # add_executable(benchmark
-#     bench/benchmark.cpp
+# bench/benchmark.cpp
 # )
 
 # target_link_libraries(benchmark
-#     PRIVATE scheduler
+# PRIVATE scheduler
 # )

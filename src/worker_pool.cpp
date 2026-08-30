@@ -39,10 +39,21 @@ void WorkerPool::worker_loop(const size_t worker_id) {
     }
 
     cv_producer.notify_one();
-    request->state = Request::State::RUNNING;
+    {
+      std::lock_guard<std::mutex> guard(request->state_mtx);
+      if (request->state == Request::State::CANCELED)
+        continue;
+      assert(request->state == Request::State::QUEUED &&
+             "request state is not QUEUED");
+      request->state = Request::State::RUNNING;
+    }
+
     simulate_work(request->isl, request->osl);
-    request->state = Request::State::FINISHED;
-    
+    {
+      std::lock_guard<std::mutex> guard(request->state_mtx);
+      request->state = Request::State::FINISHED;
+    }
+
     std::ostringstream msg;
     msg << "WORKER " << worker_id << " finished REQUEST " << request->id
         << std::endl;
@@ -56,7 +67,7 @@ void WorkerPool::shutdown() {
     assert(!this->stop_server && "already shut down!");
     this->stop_server = true;
   }
-
+  cv_consumer.notify_all();
   for (auto &worker : this->workers) {
     worker.join();
   }

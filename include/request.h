@@ -2,15 +2,29 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
-#include <atomic>
-struct Request {
+#include <mutex>
+
+struct WorkerPool;
+
+class Request {
+  friend WorkerPool;
+
+public:
+  enum class State { QUEUED, RUNNING, FINISHED, CANCELED };
+
+private:
   uint64_t id;
-  size_t isl;
-  size_t osl;
-  enum class State { QUEUED, RUNNING, FINISHED };
+  uint64_t isl;
+  uint64_t osl;
   State state;
+  std::mutex state_mtx;
   static inline std::atomic<uint64_t> uid_counter{0};
-  Request(size_t isl, size_t osl)
-      : id(uid_counter++), isl(isl), osl(osl),
-        state(State::QUEUED) {}
+
+public:
+  Request(uint64_t isl, uint64_t osl);
+  const uint64_t get_id();
+  const uint64_t get_isl();
+  const uint64_t get_osl();
+  const State get_state();
+  bool cancel();
 };

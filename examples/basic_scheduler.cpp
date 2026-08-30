@@ -4,8 +4,55 @@
 #include <random>
 #include <vector>
 using namespace scheduler;
-int main() {
-  constexpr size_t NUM_WORKERS = 4;
+
+void test_cancellation() {
+  constexpr size_t NUM_WORKERS = 1;
+  constexpr size_t NUM_REQUESTS = 20;
+
+  Scheduler scheduler(NUM_WORKERS);
+
+  std::vector<std::shared_ptr<Request>> requests;
+  requests.reserve(NUM_REQUESTS);
+
+  // Long first request keeps the single worker busy,
+  // allowing later requests to remain QUEUED.
+  auto first_request = std::make_shared<Request>(100000, 20);
+  requests.push_back(first_request);
+
+  scheduler.submit(first_request);
+
+  std::cout << "Submitted Request " << first_request->get_id()
+            << " (long-running)\n";
+
+  // These requests should mostly remain queued behind the first request.
+  for (size_t i = 1; i < NUM_REQUESTS; ++i) {
+    auto request = std::make_shared<Request>(1000, 20);
+    requests.push_back(request);
+
+    scheduler.submit(request);
+
+    bool cancelled = request->cancel();
+
+    std::ostringstream msg;
+    msg << "Submitted Request " << request->get_id()
+        << " -> cancel = " << (cancelled ? "SUCCESS" : "FAILED") << '\n';
+    std::cout << msg.str();
+  }
+
+  scheduler.shutdown();
+
+  std::cout << "\nFinal request states:\n";
+
+  for (const auto &request : requests) {
+    std::ostringstream msg;
+    msg << "Request " << request->get_id()
+        << " state = " << static_cast<int>(request->get_state()) << '\n';
+    std::cout << msg.str();
+  }
+}
+
+void test_job_submission() {
+    constexpr size_t NUM_WORKERS = 4;
   constexpr size_t NUM_PRODUCERS = 4;
   constexpr size_t REQUESTS_PER_PRODUCER = 25;
 
@@ -27,7 +74,7 @@ int main() {
 
         scheduler.submit(request);
         std::ostringstream msg;
-        msg << "submitted Request " << request->id << std::endl;
+        msg << "submitted Request " << request->get_id() << std::endl;
         std::cout << msg.str();
       }
     });
@@ -42,6 +89,10 @@ int main() {
   scheduler.shutdown();
 
   std::cout << "Scheduler shutdown complete.\n";
+}
 
+int main() {
+  test_cancellation();
+  // test_job_submission();
   return 0;
 }
