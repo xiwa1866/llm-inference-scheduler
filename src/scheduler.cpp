@@ -6,11 +6,14 @@
 using namespace scheduler;
 void Scheduler::submit(std::shared_ptr<Request> request) {
   {
-    std::lock_guard<std::mutex> guard(worker_pool_.mtx);
+    std::unique_lock<std::mutex> guard(worker_pool_.mtx);
+    // Block input request from overpressuring the scheduler
+    worker_pool_.cv_producer.wait(
+        guard, [&] { return worker_pool_.size() < MAX_QUEUE_SIZE; });
     worker_pool_.request_queue.push(request);
   }
 
-  worker_pool_.cv.notify_one();
+  worker_pool_.cv_consumer.notify_one();
 }
 
 void Scheduler::shutdown() {
