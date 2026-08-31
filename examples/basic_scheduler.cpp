@@ -16,7 +16,7 @@ void test_cancellation() {
 
   // Long first request keeps the single worker busy,
   // allowing later requests to remain QUEUED.
-  auto first_request = std::make_shared<Request>(100000, 20);
+  auto first_request = std::make_shared<Request>(4000, 20);
   requests.push_back(first_request);
 
   scheduler.submit(first_request);
@@ -66,7 +66,7 @@ void test_job_submission() {
     producers.emplace_back([producer_id, &scheduler]() {
       std::mt19937 gen(42 + producer_id);
 
-      std::uniform_int_distribution<size_t> isl_dist(100, 1000);
+      std::uniform_int_distribution<size_t> isl_dist(100, 2000);
       std::uniform_int_distribution<size_t> osl_dist(20, 100);
 
       for (size_t i = 0; i < REQUESTS_PER_PRODUCER; ++i) {
