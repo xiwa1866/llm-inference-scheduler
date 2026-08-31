@@ -17,14 +17,14 @@ private:
   uint64_t isl;
   uint64_t osl;
   State state;
-  std::mutex state_mtx;
+  mutable std::mutex state_mtx;
   static inline std::atomic<uint64_t> uid_counter{0};
 
 public:
   Request(uint64_t isl, uint64_t osl);
-  const uint64_t get_id();
-  const uint64_t get_isl();
-  const uint64_t get_osl();
-  const State get_state();
+  const uint64_t get_id() const;
+  const uint64_t get_isl() const;
+  const uint64_t get_osl() const;
+  const State get_state() const;
   bool cancel();
 };

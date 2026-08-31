@@ -18,6 +18,7 @@ add_library(scheduler
     src/worker_pool.cpp
     src/kv_cache.cpp
     src/metrics.cpp
+    src/batch.cpp
 )
 
 target_include_directories(scheduler

@@ -92,7 +92,7 @@ void test_job_submission() {
 }
 
 int main() {
-  test_cancellation();
-  // test_job_submission();
+  // test_cancellation();
+  test_job_submission();
   return 0;
 }

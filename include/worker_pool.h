@@ -6,15 +6,15 @@
 #include <thread>
 #include <vector>
 
-#define MAX_QUEUE_SIZE 16
+constexpr size_t MAX_QUEUE_SIZE=512;
 struct WorkerPool {
   std::queue<std::shared_ptr<Request>> request_queue;
-  std::mutex mtx;
-  std::condition_variable cv_consumer;
-  std::condition_variable cv_producer;
+  mutable std::mutex mtx;
+  mutable std::condition_variable cv_consumer;
+  mutable std::condition_variable cv_producer;
   std::vector<std::thread> workers;
   bool stop_server = false;
-  const size_t size();
+  const size_t size() const;
   void worker_loop(const size_t worker_id);
   void shutdown();
 
